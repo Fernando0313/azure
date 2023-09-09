@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { User } from 'src/app/auth/interfaces/user.interface';
 import { AuthService } from 'src/app/auth/services/auth.service';
+import { Token } from '../../../auth/interfaces/user.interface';
 
 @Component({
   selector: 'app-dashboard-page',
@@ -23,7 +24,7 @@ export class DashboardPageComponent {
     private router: Router
   ) {}
 
-  get user():User | undefined {
+  get user():Token | undefined {
     return this.authService.currentUser;
   }
 

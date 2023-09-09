@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
 import { Observable, tap, of, map, catchError } from 'rxjs';
-import { User } from '../interfaces/user.interface';
+import { User, Token } from '../interfaces/user.interface';
 import { enviroments } from 'src/environments/environments';
 
 
@@ -11,44 +11,45 @@ import { enviroments } from 'src/environments/environments';
 export class AuthService {
 
   private baseUrl = enviroments.baseURL;
-  private user?: User;
+  private token?: Token;
 
   constructor(private http: HttpClient) { }
 
-  get currentUser():User|undefined {
-    if ( !this.user ) return undefined;
-    return structuredClone( this.user );
+  get currentUser():Token|undefined {
+    if ( !this.token ) return undefined;
+    return structuredClone( this.token );
   }
 
-  login( email: string, password: string ):Observable<User> {
+  login( username: string, password: string ):Observable<Token> {
 
-    return this.http.post<User>(`${ this.baseUrl }/services/auth/signin`,{username:'prueba.pass.gmail.com',password:'pruebaSeleccion'})
+    return this.http.post<Token>(`${ this.baseUrl }/services/auth/signin`,{username:username,password:password})
       .pipe(
-        tap( user => console.log(user)),
+        tap( token => console.log(token)),
 
-        tap( user => this.user = user ),
-        tap( user => localStorage.setItem('token', 'aASDgjhasda.asdasd.aadsf123k' )),
+        tap( token => this.token = token ),
+        tap( token => localStorage.setItem('token', token.accessToken )),
       );
   }
 
   checkAuthentication(): Observable<boolean> {
 
     if ( !localStorage.getItem('token') ) return of(false);
+    return of(true)
 
-    const token = localStorage.getItem('token');
-
-    return this.http.get<User>(`${ this.baseUrl }/services/auth/signin`)
-      .pipe(
-        tap( user => this.user = user ),
-        map( user => !!user ),
-        catchError( err => of(false) )
-      );
+    // const token = localStorage.getItem('token');
+    // console.log(token)
+    // return this.http.get<Token>(`${ this.baseUrl }/services/auth/signin`)
+    //   .pipe(
+    //     tap( token => this.token = token ),
+    //     map( token => !!token ),
+    //     catchError( err => of(false) )
+    //   );
 
   }
 
 
   logout() {
-    this.user = undefined;
+    this.token = undefined;
     localStorage.clear();
   }
 
